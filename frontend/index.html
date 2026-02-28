@@ -1,0 +1,1428 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DhandaBot | Pure Yukti for your Daily Dhanda</title>
+
+    <!-- Distinctive Typography: Syne for premium display, DM Sans for crisp data readability -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Syne:wght@400;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Phosphor Icons for a sharp, technical look -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style>
+        /* --- CSS VARIABLES & THEME --- */
+        :root {
+            /* Electric Blue Palette (Fintech Premium) */
+            --bg-base: #020408;
+            --bg-surface: #0a0d14;
+            --bg-elevated: #111827;
+            --bg-glass: rgba(10, 13, 20, 0.7);
+
+            --text-main: #F9FAFB;
+            --text-secondary: #D1D5DB;
+            --text-muted: #6B7280;
+
+            /* Electric Blue Accent */
+            --accent-primary: #3B82F6;
+            --accent-glow: rgba(59, 130, 246, 0.15);
+            --accent-muted: #2563EB;
+
+            --border-subtle: #1a1d1c;
+            --border-highlight: rgba(255, 255, 255, 0.08);
+
+            --font-display: 'Syne', sans-serif;
+            --font-body: 'DM Sans', sans-serif;
+
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 24px;
+            --radius-pill: 99px;
+
+            --transition-snappy: 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+            --transition-smooth: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* --- RESET & BASE --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            -webkit-font-smoothing: antialiased;
+            background-image:
+                radial-gradient(circle at 10% 40%, rgba(59, 130, 246, 0.03), transparent 30%),
+                radial-gradient(circle at 90% 60%, rgba(59, 130, 246, 0.04), transparent 30%);
+        }
+
+        /* Subtle noise texture for premium, secure banking feel */
+        body::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: -1;
+            opacity: 0.035;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        button {
+            background: none;
+            border: none;
+            color: inherit;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        input,
+        textarea {
+            font-family: inherit;
+            outline: none;
+        }
+
+        /* --- LAYOUT --- */
+        #app {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: 280px;
+            background-color: var(--bg-surface);
+            border-right: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+            padding: 24px 16px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 8px;
+            margin-bottom: 32px;
+        }
+
+        .brand-logo {
+            width: 32px;
+            height: 32px;
+            background: var(--text-main);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--bg-base);
+        }
+
+        .brand-name {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 1.25rem;
+            letter-spacing: -0.02em;
+        }
+
+        .btn-new-chat {
+            background-color: transparent;
+            border: 1px solid var(--border-highlight);
+            color: var(--text-main);
+            padding: 14px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: var(--transition-snappy);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-new-chat::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, var(--accent-glow), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+
+        .btn-new-chat:hover {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        .btn-new-chat:hover::before {
+            transform: translateX(100%);
+        }
+
+        .btn-new-chat i {
+            color: var(--accent-primary);
+        }
+
+        .history-section {
+            margin-top: 32px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .history-section::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .history-section::-webkit-scrollbar-thumb {
+            background: var(--border-subtle);
+            border-radius: 4px;
+        }
+
+        .history-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            padding: 0 8px;
+            font-weight: 600;
+        }
+
+        .history-item {
+            padding: 10px 12px;
+            margin: 2px 0;
+            border-radius: var(--radius-sm);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            transition: var(--transition-snappy);
+            width: 100%;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .history-item:hover,
+        .history-item.active {
+            background-color: var(--bg-elevated);
+            color: var(--text-main);
+        }
+
+        .history-content {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .delete-session-btn {
+            opacity: 0;
+            color: var(--text-muted);
+            transition: var(--transition-snappy);
+            padding: 4px;
+            border-radius: 4px;
+        }
+
+        .history-item:hover .delete-session-btn {
+            opacity: 1;
+        }
+
+        .delete-session-btn:hover {
+            color: #ff4545;
+            background: rgba(255, 69, 69, 0.1);
+        }
+
+        /* Sidebar Profile Block */
+        .user-widget {
+            margin-top: auto;
+            padding: 12px;
+            border-radius: var(--radius-md);
+            background-color: var(--bg-elevated);
+            border: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: var(--transition-snappy);
+        }
+
+        .user-widget:hover {
+            border-color: var(--border-highlight);
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: url('https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=100&auto=format&fit=crop') center/cover;
+        }
+
+        .user-info {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .user-name {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .user-plan {
+            font-size: 0.75rem;
+            color: var(--accent-primary);
+            font-weight: 500;
+        }
+
+        /* --- MAIN AREA --- */
+        .main-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            height: 72px;
+            padding: 0 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 20;
+            background: linear-gradient(to bottom, var(--bg-base) 60%, transparent);
+        }
+
+        .model-selector {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+        }
+
+        .model-selector i {
+            color: var(--text-muted);
+        }
+
+        .login-btn-top {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-highlight);
+            padding: 8px 16px;
+            border-radius: var(--radius-pill);
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: var(--transition-snappy);
+        }
+
+        .login-btn-top:hover {
+            background: var(--text-main);
+            color: var(--bg-base);
+        }
+
+        /* Chat View */
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 100px 20% 140px 20%;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            scroll-behavior: smooth;
+        }
+
+        .chat-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .message {
+            display: flex;
+            gap: 20px;
+            max-width: 100%;
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .message.user .message-avatar {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-highlight);
+        }
+
+        .message.ai .message-avatar {
+            background: var(--accent-primary);
+            color: var(--bg-base);
+        }
+
+        .message-content {
+            flex: 1;
+            line-height: 1.6;
+            color: var(--text-main);
+            font-size: 1rem;
+        }
+
+        .message.user .message-content {
+            color: var(--text-secondary);
+        }
+
+        /* Finance Component Block */
+        .finance-block {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            margin-top: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .finance-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .finance-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--accent-primary);
+            background: var(--accent-glow);
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-family: var(--font-display);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-size: 0.7rem;
+        }
+
+        .finance-body {
+            padding: 24px;
+        }
+
+        .finance-total {
+            font-family: var(--font-display);
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+            letter-spacing: -0.02em;
+        }
+
+        .finance-subtitle {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 24px;
+        }
+
+        .budget-row {
+            margin-bottom: 16px;
+        }
+
+        .budget-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .budget-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .budget-val {
+            color: var(--text-secondary);
+        }
+
+        .bar-container {
+            height: 8px;
+            background: var(--bg-elevated);
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .fill-needs {
+            background: var(--accent-primary);
+            width: 50%;
+        }
+
+        .fill-wants {
+            background: #3B82F6;
+            width: 30%;
+        }
+
+        .fill-savings {
+            background: #8B5CF6;
+            width: 20%;
+        }
+
+        .finance-footer {
+            padding: 12px 16px;
+            border-top: 1px solid var(--border-subtle);
+            background: var(--bg-elevated);
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-action {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+            color: var(--text-main);
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            transition: var(--transition-snappy);
+        }
+
+        .btn-action:hover {
+            border-color: var(--border-highlight);
+            background: var(--bg-base);
+        }
+
+        /* Input Area */
+        .input-wrapper {
+            position: absolute;
+            bottom: 40px;
+            left: 20%;
+            right: 20%;
+            z-index: 30;
+        }
+
+        .input-box {
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-highlight);
+            border-radius: var(--radius-lg);
+            padding: 12px 16px;
+            display: flex;
+            align-items: flex-end;
+            gap: 12px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            transition: border-color var(--transition-snappy);
+        }
+
+        .input-box:focus-within {
+            border-color: var(--accent-primary);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px var(--accent-glow);
+        }
+
+        .attach-btn {
+            padding: 8px;
+            color: var(--text-muted);
+            border-radius: var(--radius-sm);
+            transition: var(--transition-snappy);
+            margin-bottom: 2px;
+        }
+
+        .attach-btn:hover {
+            color: var(--text-main);
+            background: var(--bg-elevated);
+        }
+
+        .textarea-container {
+            flex: 1;
+            position: relative;
+        }
+
+        .textarea-container textarea {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            font-size: 1rem;
+            resize: none;
+            max-height: 150px;
+            min-height: 24px;
+            padding: 8px 0;
+            line-height: 1.5;
+        }
+
+        .textarea-container textarea::placeholder {
+            color: var(--text-muted);
+        }
+
+        .send-btn {
+            background: var(--accent-primary);
+            color: var(--bg-base);
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 2px;
+            transition: var(--transition-snappy);
+        }
+
+        .send-btn:hover {
+            background: var(--accent-muted);
+            transform: scale(0.95);
+        }
+
+        .footer-text {
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 12px;
+        }
+
+        /* --- MODALS (Login & Profile) --- */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity var(--transition-smooth);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            padding: 40px;
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 400px;
+            transform: translateY(20px) scale(0.95);
+            transition: all var(--transition-smooth);
+            position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+        }
+
+        .modal-overlay.active .modal-card {
+            transform: translateY(0) scale(1);
+        }
+
+        .modal-card::before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: 20%;
+            right: 20%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-primary), transparent);
+            opacity: 0.5;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: var(--text-muted);
+        }
+
+        .close-modal:hover {
+            color: var(--text-main);
+        }
+
+        /* Login Specifics */
+        .modal-title {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .modal-subtitle {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 32px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .input-group input {
+            width: 100%;
+            background: var(--bg-base);
+            border: 1px solid var(--border-subtle);
+            padding: 14px 16px;
+            border-radius: var(--radius-sm);
+            color: var(--text-main);
+            transition: border-color 0.2s;
+        }
+
+        .input-group input:focus {
+            border-color: var(--accent-primary);
+        }
+
+        .btn-primary {
+            width: 100%;
+            background: var(--text-main);
+            color: var(--bg-base);
+            padding: 14px;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            font-size: 1rem;
+            margin-top: 10px;
+            transition: transform 0.2s;
+        }
+
+        .btn-primary:hover {
+            transform: scale(0.98);
+        }
+
+        /* Profile Specifics */
+        .profile-content {
+            text-align: center;
+        }
+
+        .profile-content .avatar-large {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 16px;
+            background: url('https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=200&auto=format&fit=crop') center/cover;
+            border: 2px solid var(--accent-primary);
+            padding: 4px;
+            background-clip: content-box;
+        }
+
+        .profile-stats {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin: 24px 0;
+            padding: 16px 0;
+            border-top: 1px solid var(--border-subtle);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-val {
+            font-family: var(--font-display);
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .btn-secondary {
+            background: var(--bg-elevated);
+            color: var(--text-main);
+            border: 1px solid var(--border-highlight);
+            padding: 12px;
+            width: 100%;
+            border-radius: var(--radius-sm);
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+
+        .btn-secondary:hover {
+            background: var(--border-subtle);
+        }
+
+        .btn-danger {
+            color: #ff4545;
+        }
+
+        /* Finance Mode Toggle */
+        .mode-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: var(--radius-pill);
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-snappy);
+            border: 1px solid var(--border-subtle);
+            background: var(--bg-elevated);
+            color: var(--text-muted);
+            margin-bottom: 2px;
+            white-space: nowrap;
+        }
+
+        .mode-toggle:hover {
+            border-color: var(--border-highlight);
+            color: var(--text-secondary);
+        }
+
+        .mode-toggle.active {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+            background: var(--accent-glow);
+            box-shadow: 0 0 12px var(--accent-glow);
+        }
+
+        .mode-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text-muted);
+            transition: var(--transition-snappy);
+        }
+
+        .mode-toggle.active .mode-dot {
+            background: var(--accent-primary);
+            box-shadow: 0 0 6px var(--accent-primary);
+        }
+
+        /* Finance mode active indicator on input box */
+        .input-box.finance-active {
+            border-color: var(--accent-primary);
+        }
+
+        @keyframes pulse {
+            from {
+                opacity: 0.4;
+                transform: scale(0.8);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1.2);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .chat-container {
+                padding: 100px 10% 140px 10%;
+            }
+
+            .input-wrapper {
+                left: 10%;
+                right: 10%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+
+            .chat-container {
+                padding: 80px 5% 140px 5%;
+            }
+
+            .input-wrapper {
+                left: 5%;
+                right: 5%;
+                bottom: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="app">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-logo"><i class="ph-bold ph-trend-up"></i></div>
+                <div class="brand-name">DhandaBot</div>
+            </div>
+
+            <button class="btn-new-chat" onclick="clearChat()">
+                New plan
+                <i class="ph-bold ph-plus"></i>
+            </button>
+
+            <button class="btn-new-chat" onclick="clearAllSessions()"
+                style="margin-top: 10px; background: var(--bg-elevated); border: 1px solid var(--border-highlight); color: var(--text-muted); font-size: 0.8rem; height: 36px;">
+                Clear History
+                <i class="ph ph-trash"></i>
+            </button>
+
+            <div class="history-section" id="dynamic-history">
+                <div class="history-label">Past Sessions</div>
+                <!-- Dynamic items will be injected here -->
+            </div>
+
+            <div class="user-widget" onclick="openModal('profile-modal')">
+                <div class="avatar"></div>
+                <div class="user-info">
+                    <div class="user-name">Dhanda User</div>
+                    <div class="user-plan">DhandaBot Pro</div>
+                </div>
+                <i class="ph ph-gear" style="color: var(--text-muted);"></i>
+            </div>
+        </aside>
+
+        <!-- MAIN AREA -->
+        <main class="main-area">
+            <header class="top-bar">
+                <div class="model-selector">
+                    DhandaBot-v2
+                </div>
+                <button class="login-btn-top" onclick="openModal('login-modal')">Sign in</button>
+            </header>
+
+            <div class="chat-container" id="chat-box">
+                <div id="anchor"></div> <!-- For auto-scrolling -->
+            </div>
+
+            <!-- Hidden file input for the attach button -->
+            <input type="file" id="file-upload" style="display:none;" accept=".pdf,.csv,.xlsx,.txt,.png,.jpg">
+
+            <div class="input-wrapper">
+                <div class="input-box" id="input-box">
+                    <button class="attach-btn" id="attach-btn" title="Upload Document"><i class="ph-bold ph-paperclip"
+                            style="font-size: 1.2rem;"></i></button>
+                    <div class="textarea-container">
+                        <textarea rows="1" placeholder="Daily dhanda ki yukti pucho..." id="chat-input"
+                            oninput="this.style.height = '';this.style.height = this.scrollHeight + 'px'"></textarea>
+                    </div>
+                    <button class="mode-toggle" id="mode-toggle" onclick="toggleFinanceMode()"
+                        title="Toggle Finance Mode">
+                        <span class="mode-dot"></span>
+                        <span id="mode-label">General</span>
+                    </button>
+                    <button class="send-btn" onclick="sendMessage()"><i class="ph-bold ph-arrow-up"></i></button>
+                </div>
+                <div class="footer-text">DhandaBot provides AI-driven financial guidance, not certified financial or
+                    legal
+                    advice. Verify critical transactions.</div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL: LOGIN -->
+    <div class="modal-overlay" id="login-modal">
+        <div class="modal-card">
+            <button class="close-modal" onclick="closeModal('login-modal')"><i class="ph-bold ph-x"
+                    style="font-size: 1.2rem;"></i></button>
+            <div class="brand-logo" style="margin-bottom: 24px;"><i class="ph-bold ph-trend-up"></i></div>
+            <h2 class="modal-title">Secure Login</h2>
+            <p class="modal-subtitle">Authenticate to access your portfolio and connected bank accounts.</p>
+
+            <div class="input-group">
+                <label>Email address</label>
+                <input type="email" placeholder="name@company.com">
+            </div>
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" placeholder="••••••••">
+            </div>
+
+            <button class="btn-primary" onclick="closeModal('login-modal')">Authenticate</button>
+
+            <p style="text-align: center; margin-top: 24px; font-size: 0.85rem; color: var(--text-muted);">
+                Protected by bank-level 256-bit encryption.
+            </p>
+        </div>
+    </div>
+
+    <!-- MODAL: PROFILE -->
+    <div class="modal-overlay" id="profile-modal">
+        <div class="modal-card profile-content">
+            <button class="close-modal" onclick="closeModal('profile-modal')"><i class="ph-bold ph-x"
+                    style="font-size: 1.2rem;"></i></button>
+
+            <div class="avatar-large"></div>
+            <h2 class="modal-title" style="font-size: 1.4rem;">Dhanda User</h2>
+            <p
+                style="color: var(--accent-primary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">
+                DhandaBot Pro Tier</p>
+
+            <div class="profile-stats">
+                <div class="stat-item">
+                    <span class="stat-val">3</span>
+                    <span class="stat-label">Linked Banks</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-val">$42k</span>
+                    <span class="stat-label">Est Net Worth</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-val">2</span>
+                    <span class="stat-label">Active Goals</span>
+                </div>
+            </div>
+
+            <button class="btn-secondary"><i class="ph ph-plugs-connected"></i> Manage Connections</button>
+            <button class="btn-secondary"><i class="ph ph-file-text"></i> Tax Documents</button>
+            <button class="btn-secondary btn-danger" onclick="closeModal('profile-modal')"><i
+                    class="ph ph-sign-out"></i> Secure Logout</button>
+        </div>
+    </div>
+
+    <script>
+        // ====== STATE ======
+        let isFinanceActive = false;
+        const API_BASE = 'http://localhost:8000/api';
+
+        // ====== MODAL LOGIC ======
+        function openModal(id) {
+            document.getElementById(id).classList.add('active');
+        }
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+        window.onclick = function (event) {
+            if (event.target.classList.contains('modal-overlay')) {
+                event.target.classList.remove('active');
+            }
+        }
+
+        // ====== FINANCE MODE TOGGLE ======
+        function toggleFinanceMode() {
+            isFinanceActive = !isFinanceActive;
+            const btn = document.getElementById('mode-toggle');
+            const label = document.getElementById('mode-label');
+            const inputBox = document.getElementById('input-box');
+
+            if (isFinanceActive) {
+                btn.classList.add('active');
+                label.textContent = 'Finance';
+                inputBox.classList.add('finance-active');
+            } else {
+                btn.classList.remove('active');
+                label.textContent = 'General';
+                inputBox.classList.remove('finance-active');
+            }
+        }
+
+        // ====== FILE UPLOAD (Fix file icon) ======
+        document.getElementById('attach-btn').addEventListener('click', () => {
+            document.getElementById('file-upload').click();
+        });
+        document.getElementById('file-upload').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            // Display file name as a user message
+            const chatBox = document.getElementById('chat-box');
+            const anchor = document.getElementById('anchor');
+            const fileHtml = `
+                <div class="message user">
+                    <div class="message-avatar"><i class="ph ph-user"></i></div>
+                    <div class="message-content"><i class="ph ph-file-text" style="margin-right:6px;"></i> Uploaded: <strong>${file.name}</strong> (${(file.size / 1024).toFixed(1)} KB)</div>
+                </div>
+            `;
+            anchor.insertAdjacentHTML('beforebegin', fileHtml);
+            chatBox.scrollTop = chatBox.scrollHeight;
+            // Reset the input so the same file can be re-uploaded
+            e.target.value = '';
+        });
+
+        // ====== NEW CHAT / WELCOME SCREEN ======
+        function showWelcomeScreen() {
+            const chatBox = document.getElementById('chat-box');
+            chatBox.innerHTML = '<div id="anchor"></div>';
+
+            const welcomeMsg = document.createElement('div');
+            welcomeMsg.id = "welcome-screen";
+            welcomeMsg.style.cssText = "margin: auto; text-align: center; color: var(--text-muted); font-family: var(--font-display); font-size: 1.8rem; font-weight: 600; opacity: 0; animation: fadeIn 1s forwards; max-width: 500px; line-height: 1.4; padding: 40px 20px;";
+            welcomeMsg.innerHTML = `
+                <i class="ph-bold ph-trend-up" style="color: var(--accent-primary); font-size: 4rem; margin-bottom: 24px; display: block;"></i>
+                DhandaBot
+                <p style="font-size: 1.2rem; font-weight: 500; margin-top: 8px; color: var(--accent-primary);">
+                    Pure yukti for your daily dhanda
+                </p>
+                <p style="font-size: 1rem; font-weight: 400; margin-top: 16px; color: var(--text-muted);">
+                    Ask about investments, budgeting, or banking products.
+                </p>
+            `;
+            chatBox.insertBefore(welcomeMsg, document.getElementById('anchor'));
+        }
+
+        function clearChat() {
+            localStorage.removeItem('dhandabot_session_id');
+            showWelcomeScreen();
+            document.querySelectorAll('.history-item').forEach(item => item.classList.remove('active'));
+            loadSessions(); // Refresh list to ensure we don't have a dead active item
+        }
+
+        // ====== MESSAGE RENDERING & VISUALIZATION ======
+        function renderBudgetBlock(jsonStr) {
+            try {
+                const data = JSON.parse(jsonStr);
+                const categoriesHtml = data.categories.map(cat => {
+                    const percentage = (cat.value / data.total * 100).toFixed(0);
+                    return `
+                        <div class="budget-row">
+                            <div class="budget-labels">
+                                <span><span style="color: ${cat.color}; margin-right: 6px;">●</span>${cat.name} (${percentage}%)</span>
+                                <span class="budget-val" style="color: var(--text-main); font-weight: 600;">${data.currency} ${cat.value.toLocaleString()}</span>
+                            </div>
+                            <div class="bar-container">
+                                <div class="bar-fill" style="width: ${percentage}%; background: ${cat.color};"></div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                return `
+                    <div class="finance-block">
+                        <div class="finance-header">
+                            <div class="finance-badge"><i class="ph-bold ph-chart-pie"></i> Visual Breakdown</div>
+                            <span style="font-size: 0.85rem; color: var(--text-muted);"><i class="ph ph-shield-check"></i> Projections</span>
+                        </div>
+                        <div class="finance-body">
+                            <div class="finance-total">${data.currency} ${data.total.toLocaleString()}<span style="font-size: 1.2rem; color: var(--text-muted);">/total</span></div>
+                            <div class="finance-subtitle">Allocation Analysis</div>
+                            ${categoriesHtml}
+                        </div>
+                        <div class="finance-footer">
+                            <button class="btn-action" onclick="exportToCSV()"><i class="ph ph-export"></i> Export Data</button>
+                        </div>
+                    </div>
+                `;
+            } catch (e) {
+                console.warn('[Viz] Parse error:', e);
+                return '';
+            }
+        }
+
+        function formatMessageContent(content) {
+            let vizHtml = '';
+            const vizMatch = content.match(/\[BUDGET_JSON\]([\s\S]*?)\[\/BUDGET_JSON\]/);
+
+            if (vizMatch) {
+                vizHtml = renderBudgetBlock(vizMatch[1]);
+                content = content.replace(vizMatch[0], ''); // Remove tag from text
+            }
+
+            const textHtml = content.trim().replace(/\n/g, '<br/>');
+            return `
+                <div class="message-content">
+                    ${textHtml}
+                    ${vizHtml}
+                </div>
+            `;
+        }
+
+        // ====== SEND MESSAGE (Real Backend + Mode) ======
+        async function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const chatBox = document.getElementById('chat-box');
+            const anchor = document.getElementById('anchor');
+
+            // Remove welcome message if present
+            const welcome = document.getElementById('welcome-screen');
+            if (welcome) welcome.remove();
+
+            // User message
+            const userHtml = `
+                <div class="message user">
+                    <div class="message-avatar"><i class="ph ph-user"></i></div>
+                    <div class="message-content">${text}</div>
+                </div>
+            `;
+            anchor.insertAdjacentHTML('beforebegin', userHtml);
+            input.value = '';
+            input.style.height = '24px';
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            // Loading indicator
+            const aiLoadingHtml = `
+                <div class="message ai" id="ai-loading">
+                    <div class="message-avatar"><i class="ph-bold ph-trend-up"></i></div>
+                    <div class="message-content">
+                        <span style="display:inline-block; width: 8px; height: 8px; background: var(--accent-primary); border-radius: 50%; animation: pulse 1s infinite alternate;"></span>
+                    </div>
+                </div>
+            `;
+            anchor.insertAdjacentHTML('beforebegin', aiLoadingHtml);
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            try {
+                const sessionId = localStorage.getItem('dhandabot_session_id');
+                const reqBody = {
+                    message: text,
+                    mode: isFinanceActive ? 'finance' : 'general'
+                };
+                if (sessionId) reqBody.session_id = sessionId;
+
+                const response = await fetch(`${API_BASE}/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(reqBody)
+                });
+
+                if (!response.ok) throw new Error('Backend error');
+
+                const data = await response.json();
+                if (data.session_id && data.session_id !== sessionId) {
+                    localStorage.setItem('dhandabot_session_id', data.session_id);
+                    loadSessions(); // Update sidebar with new session
+                }
+
+                document.getElementById('ai-loading').remove();
+
+                const aiResponseHtml = `
+                    <div class="message ai">
+                        <div class="message-avatar"><i class="ph-bold ph-trend-up"></i></div>
+                        ${formatMessageContent(data.reply)}
+                    </div>
+                `;
+                anchor.insertAdjacentHTML('beforebegin', aiResponseHtml);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            } catch (err) {
+                console.error(err);
+                const loadEl = document.getElementById('ai-loading');
+                if (loadEl) loadEl.remove();
+                const errHtml = `
+                    <div class="message ai">
+                        <div class="message-avatar" style="background:#ff4545;"><i class="ph-bold ph-warning"></i></div>
+                        <div class="message-content" style="color:#ff4545;">Error connecting to backend. Ensure the server is running.</div>
+                    </div>
+                `;
+                anchor.insertAdjacentHTML('beforebegin', errHtml);
+            }
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        // ====== SESSION MANAGEMENT ======
+        async function loadSessions() {
+            try {
+                const response = await fetch(`${API_BASE}/sessions`);
+                if (!response.ok) return;
+                const sessions = await response.json();
+
+                const container = document.getElementById('dynamic-history');
+                const currentSessionId = localStorage.getItem('dhandabot_session_id');
+
+                // Keep the label
+                container.innerHTML = '<div class="history-label">Past Sessions</div>';
+
+                sessions.forEach(s => {
+                    const item = document.createElement('div');
+                    item.className = `history-item ${s.session_id === currentSessionId ? 'active' : ''}`;
+                    item.onclick = () => switchSession(s.session_id);
+
+                    // Format title - show first 30 chars of the first message
+                    let title = s.title || "New Session";
+                    if (title.length > 30) title = title.substring(0, 27) + "...";
+
+                    item.innerHTML = `
+                        <div class="history-content">
+                            <i class="ph ph-chat-centered-text"></i>
+                            <span>${title}</span>
+                        </div>
+                        <button class="delete-session-btn" onclick="event.stopPropagation(); deleteSession('${s.session_id}')">
+                            <i class="ph ph-trash"></i>
+                        </button>
+                    `;
+                    container.appendChild(item);
+                });
+            } catch (e) {
+                console.warn('[Sidebar] Could not load sessions:', e);
+            }
+        }
+
+        async function switchSession(id) {
+            localStorage.setItem('dhandabot_session_id', id);
+            await hydrateChat(id);
+            loadSessions(); // Refresh sidebar to update active state
+        }
+
+        async function hydrateChat(sessionId) {
+            if (!sessionId) {
+                showWelcomeScreen();
+                return;
+            }
+
+            try {
+                const url = `${API_BASE}/history/${sessionId}`;
+                const response = await fetch(url);
+                if (!response.ok) return;
+
+                const messages = await response.json();
+                const chatBox = document.getElementById('chat-box');
+                chatBox.innerHTML = '<div id="anchor"></div>';
+                const anchor = document.getElementById('anchor');
+
+                if (messages.length === 0) {
+                    showWelcomeScreen();
+                    return;
+                }
+
+                messages.forEach(msg => {
+                    if (msg.role === 'user') {
+                        const html = `
+                            <div class="message user">
+                                <div class="message-avatar"><i class="ph ph-user"></i></div>
+                                <div class="message-content">${msg.content}</div>
+                            </div>
+                        `;
+                        anchor.insertAdjacentHTML('beforebegin', html);
+                    } else {
+                        const html = `
+                            <div class="message ai">
+                                <div class="message-avatar"><i class="ph-bold ph-trend-up"></i></div>
+                                ${formatMessageContent(msg.content)}
+                            </div>
+                        `;
+                        anchor.insertAdjacentHTML('beforebegin', html);
+                    }
+                });
+
+                chatBox.scrollTop = chatBox.scrollHeight;
+            } catch (e) {
+                console.warn('[Hydration] Error:', e);
+            }
+        }
+
+        async function deleteSession(id) {
+            if (!confirm('Are you sure you want to delete this chat?')) return;
+            try {
+                const response = await fetch(`${API_BASE}/session/${id}`, { method: 'DELETE' });
+                if (response.ok) {
+                    const currentId = localStorage.getItem('dhandabot_session_id');
+                    if (id === currentId) clearChat();
+                    loadSessions();
+                }
+            } catch (err) { console.error(err); }
+        }
+
+        async function clearAllSessions() {
+            if (!confirm('Clear all chat history? This cannot be undone.')) return;
+            try {
+                const response = await fetch(`${API_BASE}/sessions`, { method: 'DELETE' });
+                if (response.ok) {
+                    clearChat();
+                    loadSessions();
+                }
+            } catch (err) { console.error(err); }
+        }
+
+        // ====== SESSION HYDRATION ON PAGE LOAD ======
+        document.addEventListener('DOMContentLoaded', async function () {
+            const sessionId = localStorage.getItem('dhandabot_session_id');
+            await hydrateChat(sessionId);
+            loadSessions();
+        });
+
+        // ====== EXPORT TO CSV ======
+        function exportToCSV() {
+            const chatBox = document.getElementById('chat-box');
+            const messages = chatBox.querySelectorAll('.message');
+            if (messages.length === 0) {
+                alert("No chat history to export.");
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,Role,Content\n";
+            messages.forEach(msg => {
+                const role = msg.classList.contains('user') ? 'User' : 'Assistant';
+                // Clone content and remove buttons before getting text
+                const contentDiv = msg.querySelector('.message-content').cloneNode(true);
+                const buttons = contentDiv.querySelectorAll('button');
+                buttons.forEach(b => b.remove());
+
+                let content = contentDiv.innerText.trim();
+                content = content.replace(/"/g, '""');
+                csvContent += `${role},"${content}"\n`;
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `dhandabot_chat_export_${new Date().getTime()}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // ====== ENTER KEY ======
+        document.getElementById('chat-input').addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+
+</html>
